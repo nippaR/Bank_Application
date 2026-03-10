@@ -21,7 +21,10 @@ export async function POST(_: Request, { params }: Params) {
             },
         });
 
-        return NextResponse.redirect(new URL("/admin/dashboard", process.env.NEXTAUTH_URL || "http://localhost:3000"));
+        return NextResponse.json({
+            success: true,
+            message: "User approved successfully",
+        });
     } catch (error) {
         console.error("Approve user error:", error);
 

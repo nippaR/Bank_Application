@@ -67,11 +67,14 @@ export async function POST(req: Request, { params }: Params) {
                 text: `Dear Customer, your requested changes for the credit card application (ID: ${changeReq.applicationId}) have been approved.`,
             });
 
-            return NextResponse.redirect(new URL("/finance/dashboard", req.url));
+            return NextResponse.json({
+                success: true,
+                message: "Change request approved successfully",
+            });
 
         } else if (action === "reject") {
-            const formData = await req.formData();
-            const reason = String(formData.get("reason") || "").trim();
+            const body = await req.json().catch(() => ({}));
+            const reason = String(body.reason || "").trim();
 
             if (!reason) {
                 return NextResponse.json({ success: false, message: "Reject reason is required" }, { status: 400 });
@@ -91,7 +94,10 @@ export async function POST(req: Request, { params }: Params) {
                 text: `Dear Customer, your requested changes for the credit card application (ID: ${changeReq.applicationId}) have been rejected.\n\nReason: ${reason}`,
             });
 
-            return NextResponse.redirect(new URL("/finance/dashboard", req.url));
+            return NextResponse.json({
+                success: true,
+                message: "Change request rejected successfully",
+            });
         }
 
         return NextResponse.json({ success: false, message: "Invalid action" }, { status: 400 });

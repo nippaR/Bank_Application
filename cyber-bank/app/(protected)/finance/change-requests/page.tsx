@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { ArrowLeft, User, Mail, Phone, FileText, Check, X, AlertCircle } from "lucide-react";
+import { ArrowLeft, User, Mail, Phone, FileText, AlertCircle } from "lucide-react";
 import Link from "next/link";
+import ChangeRequestActions from "./ChangeRequestActions";
 
 function ComparisonRow({
     label,
@@ -14,18 +15,18 @@ function ComparisonRow({
     const isChanged = oldValue !== newValue;
 
     return (
-        <div className={`grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 py-3 border-b border-white/5 last:border-0 transition-colors ${isChanged ? 'bg-blue-500/5' : ''}`}>
-            <div className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center">
+        <div className={`grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 py-4 border-b border-white/5 last:border-0 transition-all ${isChanged ? 'bg-blue-500/5' : ''}`}>
+            <div className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] flex items-center px-4 md:px-0">
                 {label}
             </div>
-            <div className="text-sm text-gray-400 break-all md:break-normal">
-                <span className="md:hidden text-[10px] text-gray-600 block mb-0.5">CURRENT</span>
-                {oldValue || <span className="italic opacity-30">empty</span>}
+            <div className="text-sm text-gray-400 break-all md:break-normal px-4 md:px-0">
+                <span className="md:hidden text-[10px] text-gray-600 block mb-1 font-bold uppercase tracking-widest">CURRENT</span>
+                {oldValue || <span className="italic opacity-30 tracking-tight">empty</span>}
             </div>
-            <div className={`text-sm break-all md:break-normal font-medium ${isChanged ? 'text-yellow-400' : 'text-gray-400'}`}>
-                <span className="md:hidden text-[10px] text-gray-600 block mb-0.5">REQUESTED</span>
+            <div className={`text-sm break-all md:break-normal font-medium px-4 md:px-0 ${isChanged ? 'text-yellow-400' : 'text-gray-400'}`}>
+                <span className="md:hidden text-[10px] text-gray-600 block mb-1 font-bold uppercase tracking-widest">REQUESTED</span>
                 <div className="flex items-center gap-2">
-                    {newValue || <span className="italic opacity-30">empty</span>}
+                    {newValue || <span className="italic opacity-30 tracking-tight">empty</span>}
                     {isChanged && <AlertCircle className="w-3.5 h-3.5 text-yellow-500/50" />}
                 </div>
             </div>
@@ -34,7 +35,7 @@ function ComparisonRow({
 }
 
 export default async function FinanceChangeRequestsPage() {
-    const changeRequests = await prisma.creditCardApplicationChangeRequest.findMany({
+    const rawRequests = await prisma.creditCardApplicationChangeRequest.findMany({
         include: {
             application: true,
             customer: true,
@@ -47,76 +48,96 @@ export default async function FinanceChangeRequestsPage() {
         },
     });
 
+    // Fix serialization for Decimal and Dates
+    const changeRequests = rawRequests.map(req => ({
+        ...req,
+        monthlyIncome: Number(req.monthlyIncome),
+        dateOfBirth: req.dateOfBirth.toISOString(),
+        createdAt: req.createdAt.toISOString(),
+        updatedAt: req.updatedAt.toISOString(),
+        application: {
+            ...req.application,
+            monthlyIncome: Number(req.application.monthlyIncome),
+            dateOfBirth: req.application.dateOfBirth.toISOString(),
+            submittedAt: req.application.submittedAt.toISOString(),
+            updatedAt: req.application.updatedAt.toISOString(),
+        }
+    }));
+
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-12">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
+        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-1000 pb-24 px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+                <div className="space-y-2">
                     <Link
                         href="/finance/dashboard"
-                        className="inline-flex items-center text-sm text-gray-400 hover:text-blue-400 transition-colors mb-2 group"
+                        className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-blue-400 transition-all mb-4 group"
                     >
-                        <ArrowLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
+                        <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
                         Back to Dashboard
                     </Link>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                        Application Change Review
+                    <h1 className="text-4xl font-black bg-gradient-to-r from-white via-white to-gray-600 bg-clip-text text-transparent tracking-tighter">
+                        Review Changes
                     </h1>
                 </div>
-                <div className="bg-yellow-500/10 text-yellow-500 px-4 py-2 rounded-xl border border-yellow-500/20 text-sm font-medium flex items-center gap-2">
-                    <span className="relative flex h-2 w-2">
+                <div className="bg-yellow-500/10 text-yellow-500 px-6 py-3 rounded-2xl border border-yellow-500/20 text-sm font-bold flex items-center gap-3 backdrop-blur-md">
+                    <span className="relative flex h-2.5 w-2.5">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-yellow-500"></span>
                     </span>
                     {changeRequests.length} Pending Review{changeRequests.length !== 1 ? 's' : ''}
                 </div>
             </div>
 
             {changeRequests.length === 0 ? (
-                <div className="premium-card p-12 text-center">
-                    <div className="bg-gray-500/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <FileText className="w-8 h-8 text-gray-400" />
+                <div className="premium-card p-24 text-center border-dashed border-white/10 group hover:border-blue-500/30 transition-all">
+                    <div className="bg-blue-500/5 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-white/5 group-hover:scale-110 transition-transform duration-500">
+                        <FileText className="w-10 h-10 text-blue-400/50" />
                     </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Queue is Empty</h3>
-                    <p className="text-gray-400 max-w-xs mx-auto">
-                        Excellent work! There are no pending change requests waiting for your review.
+                    <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">Queue is Clear</h3>
+                    <p className="text-gray-500 max-w-sm mx-auto text-sm leading-relaxed">
+                        There are no pending profile update requests. All customer data is currently up to date.
                     </p>
                 </div>
             ) : (
-                <div className="grid gap-8">
+                <div className="grid gap-12">
                     {changeRequests.map((req) => (
-                        <div key={req.id} className="premium-card overflow-hidden">
+                        <div key={req.id} className="premium-card overflow-hidden border border-white/5 hover:border-white/10 transition-all rounded-[32px] shadow-2xl">
                             {/* Card Header */}
-                            <div className="bg-white/5 px-6 py-4 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/20">
-                                        <User className="w-5 h-5 text-blue-400" />
+                            <div className="bg-white/5 px-8 py-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/10 flex items-center justify-center border border-blue-500/20 shadow-inner">
+                                        <User className="w-6 h-6 text-blue-400" />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold text-white">{req.customer.fullName}</h3>
-                                        <p className="text-xs text-gray-500 font-mono tracking-tighter">APP ID: {req.applicationId}</p>
+                                        <h3 className="text-xl font-black text-white tracking-tight">{req.customer.fullName}</h3>
+                                        <p className="text-[10px] text-gray-500 font-mono tracking-widest uppercase mt-0.5 opacity-60">APP ID: {req.applicationId}</p>
                                     </div>
                                 </div>
-                                <div className="flex gap-4 text-xs">
-                                    <div className="flex items-center gap-1.5 text-gray-400">
-                                        <Mail className="w-3.5 h-3.5 text-blue-400/50" />
+                                <div className="flex flex-wrap gap-6 text-xs font-medium">
+                                    <div className="flex items-center gap-2.5 text-gray-400 group cursor-default">
+                                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center border border-white/5 group-hover:border-blue-500/20 transition-all">
+                                            <Mail className="w-3.5 h-3.5 text-blue-400 opacity-60" />
+                                        </div>
                                         {req.email}
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-gray-400">
-                                        <Phone className="w-3.5 h-3.5 text-blue-400/50" />
+                                    <div className="flex items-center gap-2.5 text-gray-400 group cursor-default">
+                                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center border border-white/5 group-hover:border-blue-500/20 transition-all">
+                                            <Phone className="w-3.5 h-3.5 text-blue-400 opacity-60" />
+                                        </div>
                                         {req.mobilePhone}
                                     </div>
                                 </div>
                             </div>
 
                             {/* Comparison Table */}
-                            <div className="p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] px-2 hidden md:grid">
-                                    <div>Attribute</div>
-                                    <div>Current Value</div>
-                                    <div className="text-yellow-500/70">Requested Value</div>
+                            <div className="p-8">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 px-4 hidden md:grid">
+                                    <div className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em]">Field</div>
+                                    <div className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em] pl-4 border-l border-white/5 text-center">Original Value</div>
+                                    <div className="text-[10px] font-black text-yellow-500/40 uppercase tracking-[0.3em] pl-4 border-l border-white/5 text-center">Requested Update</div>
                                 </div>
 
-                                <div className="space-y-0 border border-white/5 rounded-xl overflow-hidden bg-black/20">
+                                <div className="space-y-0 border border-white/5 rounded-2xl overflow-hidden bg-black/40 backdrop-blur-xl shadow-inner">
                                     <ComparisonRow
                                         label="Full Name"
                                         oldValue={req.application.fullName}
@@ -161,41 +182,14 @@ export default async function FinanceChangeRequestsPage() {
                             </div>
 
                             {/* Actions Footer */}
-                            <div className="bg-black/40 px-6 py-6 border-t border-white/5">
-                                <div className="flex flex-col lg:flex-row gap-6 items-end">
-                                    <div className="flex-1 w-full">
-                                        <p className="text-xs font-bold text-white uppercase tracking-widest mb-3 flex items-center gap-2">
-                                            <X className="w-3 h-3 text-red-500/50" />
-                                            Rejection Reason (Required for rejection)
-                                        </p>
-                                        <form id={`reject-form-${req.id}`} action={`/api/finance/change-requests/${req.id}/reject`} method="POST">
-                                            <textarea
-                                                name="reason"
-                                                placeholder="Explain why this change is being rejected..."
-                                                required
-                                                className="w-full bg-black/60 border border-white rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500/50 outline-none transition-all min-h-[100px] text-white placeholder:text-gray-700"
-                                            />
-                                        </form>
-                                    </div>
-
-                                    <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto shrink-0">
-                                        <button
-                                            form={`reject-form-${req.id}`}
-                                            type="submit"
-                                            className="px-8 py-3 rounded-xl border border-red-500/30 text-red-500 font-bold text-sm hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2"
-                                        >
-                                            <X className="w-4 h-4" />
-                                            Reject Change
-                                        </button>
-
-                                        <form action={`/api/finance/change-requests/${req.id}/approve`} method="POST">
-                                            <button className="w-full sm:w-auto px-8 py-3 rounded-xl bg-green-600 hover:bg-green-500 text-white font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-900/20">
-                                                <Check className="w-4 h-4" />
-                                                Approve Changes
-                                            </button>
-                                        </form>
-                                    </div>
+                            <div className="bg-black/60 px-8 py-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+                                <div className="flex items-center gap-4 text-gray-500">
+                                    <AlertCircle className="w-5 h-5 opacity-30" />
+                                    <p className="text-sm font-medium leading-relaxed max-w-md">
+                                        Review these changes carefully. Approving will permanently overwrite the customer's current data.
+                                    </p>
                                 </div>
+                                <ChangeRequestActions requestId={req.id} />
                             </div>
                         </div>
                     ))}

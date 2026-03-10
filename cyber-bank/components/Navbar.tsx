@@ -26,7 +26,7 @@ export default function Navbar() {
             : '/customer/dashboard';
 
     return (
-        <nav className="glass-morphism sticky top-0 z-50 px-6 py-4 rounded-xl bg-black/70">
+        <nav className="glass-morphism sticky top-0 z-50 px-6 py-5 rounded-2xl bg-black/60 backdrop-blur-[16px] border-b border-white/10 mx-4 mt-4">
             <div className="max-w-7xl mx-auto flex justify-between items-center">
                 <Link href="#" className="text-xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                     Cyber Bank
@@ -36,23 +36,23 @@ export default function Navbar() {
                 <div className="hidden md:flex items-center space-x-8">
                     {session && (
                         <>
-                            <Link href={dashboardLink} className="hover:text-primary transition-colors">
+                            <Link href={dashboardLink} className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-white transition-all">
                                 Dashboard
                             </Link>
                             {
                                 role === 'ADMIN' && (
-                                    <Link href="/admin/finance-users" className="hover:text-primary transition-colors">
+                                    <Link href="/admin/finance-users" className="hover:text-primary transition-all duration-300 font-bold uppercase tracking-widest text-[10px] py-2 px-4 rounded-xl hover:bg-white/5">
                                         Add New Users
                                     </Link>
                                 )
                             }
                             {role === 'CUSTOMER' && (
-                                <Link href="/customer/credit-card/apply" className="hover:text-primary transition-colors">
+                                <Link href="/customer/credit-card/apply" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-white transition-all">
                                     Credit Card
                                 </Link>
                             )}
                             {role === 'FINANCE' && (
-                                <Link href="/finance/finance-users" className="hover:text-primary transition-colors">
+                                <Link href="/finance/finance-users" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-white transition-all">
                                     Users
                                 </Link>
                             )}
@@ -60,13 +60,13 @@ export default function Navbar() {
                     )}
 
                     {session ? (
-                        <div className="flex items-center space-x-4">
-                            <span className="text-sm text-gray-400">{session.user?.email}</span>
+                        <div className="flex items-center gap-6">
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest hidden lg:block opacity-60">{session.user?.email}</span>
                             <button
                                 onClick={() => signOut({ callbackUrl: '/login' })}
-                                className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg transition-all text-sm font-medium"
+                                className="px-6 py-2.5 rounded-xl bg-white/5 border border-white text-white font-black text-[10px] uppercase tracking-[0.2em] hover:bg-red-600 hover:border-red-600 transition-all shadow-xl hover:shadow-red-600/20 active:scale-95"
                             >
-                                Logout
+                                Sign Out
                             </button>
                         </div>
                     ) : (
@@ -117,16 +117,16 @@ export default function Navbar() {
                     {session ? (
                         <button
                             onClick={() => signOut({ callbackUrl: '/login' })}
-                            className="w-full bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg transition-all text-sm font-medium"
+                            className="w-full bg-red-600/10 border border-red-600/20 text-red-500 py-4 rounded-xl font-black text-xs uppercase tracking-[0.2em] transition-all"
                         >
-                            Logout
+                            Log Out
                         </button>
                     ) : (
                         <Link
                             href="/login"
-                            className="block w-full bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg transition-all text-sm font-medium text-center"
+                            className="block w-full bg-white text-black py-4 rounded-xl font-black text-xs uppercase tracking-[0.2em] transition-all text-center"
                         >
-                            Login
+                            Sign In
                         </Link>
                     )}
                 </div>

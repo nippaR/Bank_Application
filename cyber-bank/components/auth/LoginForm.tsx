@@ -35,7 +35,7 @@ export default function LoginForm() {
         <div className="w-full max-w-lg mx-auto p-1 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <form
                 onSubmit={handleLogin}
-                className="premium-card p-10 space-y-8 border-2 border-gray-400 rounded-2xl shadow-2xl relative overflow-hidden"
+                className="premium-card p-12 space-y-10 border border-white/10 rounded-[24px] relative overflow-hidden shadow-2xl"
             >
                 {/* Decorative element */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl animate-pulse" />
