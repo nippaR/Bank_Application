@@ -1,6 +1,8 @@
+//Fetches all users from the database
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+//Handles GET requests to fetch all users
 export async function GET() {
     try {
         const users = await prisma.user.findMany({
