@@ -11,8 +11,8 @@ export async function POST(req: Request, { params }: Params) {
     try {
         const { id } = await params;
 
-        const formData = await req.formData();
-        const reason = String(formData.get("reason") || "").trim();
+        const body = await req.json().catch(() => ({}));
+        const reason = String(body.reason || "").trim();
 
         if (!reason) {
             return NextResponse.json(
@@ -45,12 +45,10 @@ export async function POST(req: Request, { params }: Params) {
             filename: "credit-card-rejection-letter.pdf",
         });
 
-        return NextResponse.redirect(
-            new URL(
-                "/finance/dashboard",
-                process.env.NEXTAUTH_URL || "http://localhost:3000"
-            )
-        );
+        return NextResponse.json({
+            success: true,
+            message: "Application rejected successfully",
+        });
     } catch (error: any) {
         console.error("Reject application error:", error);
 

@@ -35,12 +35,10 @@ export async function POST(_: Request, { params }: Params) {
             filename: "credit-card-approval-letter.pdf",
         });
 
-        return NextResponse.redirect(
-            new URL(
-                "/finance/dashboard",
-                process.env.NEXTAUTH_URL || "http://localhost:3000"
-            )
-        );
+        return NextResponse.json({
+            success: true,
+            message: "Application approved successfully",
+        });
     } catch (error: any) {
         console.error("Approve application error:", error);
 

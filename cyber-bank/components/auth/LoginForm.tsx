@@ -76,9 +76,6 @@ export default function LoginForm() {
                             <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">
                                 Password
                             </label>
-                            <Link href="#" className="text-[10px] text-primary hover:text-white transition-colors font-bold uppercase tracking-tighter">
-                                Forgot Password?
-                            </Link>
                         </div>
                         <div className="relative group">
                             <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 group-focus-within:text-primary transition-colors">
