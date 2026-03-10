@@ -1,3 +1,4 @@
+//Handles authentication requests
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
@@ -8,7 +9,7 @@ export const authOptions: NextAuthOptions = {
         strategy: "jwt",
         maxAge: 10 * 60, // 10 minutes in seconds
     },
-    providers: [
+    providers: [        //Handles authentication requests
         CredentialsProvider({
             name: "Credentials",
             credentials: {
@@ -38,7 +39,7 @@ export const authOptions: NextAuthOptions = {
                 if (!isValidPassword) {
                     throw new Error("Invalid password");
                 }
-
+                //Returns the authenticated user
                 return {
                     id: user.id,
                     name: user.fullName,
@@ -50,6 +51,7 @@ export const authOptions: NextAuthOptions = {
         }),
     ],
     callbacks: {
+        //Handles authentication requests
         async jwt({ token, user }) {
             if (user) {
                 token.id = (user as any).id;
@@ -58,6 +60,7 @@ export const authOptions: NextAuthOptions = {
             }
             return token;
         },
+        //Handles authentication requests
         async session({ session, token }) {
             if (session.user) {
                 (session.user as any).id = token.id;

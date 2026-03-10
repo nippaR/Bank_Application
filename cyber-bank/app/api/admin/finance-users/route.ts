@@ -1,8 +1,10 @@
+//Receives user data from the frontend and creates a new finance user
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+//Schema for validating the finance user data
 const createFinanceUserSchema = z.object({
     fullName: z
         .string()
@@ -26,6 +28,7 @@ const createFinanceUserSchema = z.object({
         .min(8, "Password must be at least 8 characters"),
 });
 
+//Handles POST requests to create a new finance user
 export async function POST(request: Request) {
     try {
         const body = await request.json();
@@ -71,7 +74,7 @@ export async function POST(request: Request) {
                 status: "ACTIVE",
             },
         });
-
+        //Returns the created finance user
         return NextResponse.json(
             {
                 success: true,
@@ -85,7 +88,7 @@ export async function POST(request: Request) {
             },
             { status: 201 }
         );
-    } catch (error) {
+    } catch (error) {   //Handles errors
         console.error("Create finance user error:", error);
 
         return NextResponse.json(
