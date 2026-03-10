@@ -61,73 +61,103 @@ export default function CreateFinanceUserForm() {
     };
 
     return (
-        <form
-            onSubmit={handleSubmit}
-            className="max-w-md space-y-4 rounded-lg border p-6"
-        >
-            <h1 className="text-2xl font-bold">Create Finance User</h1>
-
-            <div>
-                <label className="mb-1 block">Full Name</label>
-                <input
-                    name="fullName"
-                    value={form.fullName}
-                    onChange={handleChange}
-                    className="w-full rounded border px-3 py-2"
-                    required
-                />
-            </div>
-
-            <div>
-                <label className="mb-1 block">Email</label>
-                <input
-                    type="email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    className="w-full rounded border px-3 py-2"
-                    required
-                />
-            </div>
-
-            <div>
-                <label className="mb-1 block">Phone</label>
-                <input
-                    name="phone"
-                    value={form.phone}
-                    onChange={handleChange}
-                    className="w-full rounded border px-3 py-2"
-                    required
-                />
-            </div>
-
-            <div>
-                <label className="mb-1 block">Password</label>
-                <input
-                    type="password"
-                    name="password"
-                    value={form.password}
-                    onChange={handleChange}
-                    className="w-full rounded border px-3 py-2"
-                    required
-                />
-            </div>
-
-            <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded bg-blue-600 px-4 py-2 text-white"
+        <div className="w-full max-w-lg mx-auto p-1 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <form
+                onSubmit={handleSubmit}
+                className="premium-card p-8 space-y-6 border-2 border-gray-400 rounded-xl"
             >
-                {loading ? "Creating..." : "Create Finance User"}
-            </button>
+                <div className="text-center space-y-2">
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                        Create Finance User
+                    </h1>
+                    <p className="text-gray-400 text-sm">Register a new representative for the finance department.</p>
+                </div>
 
-            {serverMessage && (
-                <p className="text-sm text-green-600">{serverMessage}</p>
-            )}
+                <div className="space-y-4">
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-gray-300 ml-1">Full Name</label>
+                        <input
+                            name="fullName"
+                            value={form.fullName}
+                            onChange={handleChange}
+                            placeholder="John Doe"
+                            className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-600"
+                            required
+                        />
+                    </div>
 
-            {serverError && (
-                <p className="text-sm text-red-600">{serverError}</p>
-            )}
-        </form>
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-gray-300 ml-1">Email Address</label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={form.email}
+                            onChange={handleChange}
+                            placeholder="john@example.com"
+                            className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-600"
+                            required
+                        />
+                    </div>
+
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-gray-300 ml-1">Phone Number</label>
+                        <input
+                            name="phone"
+                            value={form.phone}
+                            onChange={handleChange}
+                            placeholder="+94 7X XXX XXXX"
+                            className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-600"
+                            required
+                        />
+                    </div>
+
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-gray-300 ml-1">Secure Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            value={form.password}
+                            onChange={handleChange}
+                            placeholder="••••••••"
+                            className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-600"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-white hover:bg-white-hover text-black py-3 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105"
+                >
+                    {loading ? (
+                        <>
+                            <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                            Processing...
+                        </>
+                    ) : (
+                        "Create Finance User"
+                    )}
+                </button>
+
+                {serverMessage && (
+                    <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-500 text-sm flex items-center gap-2 animate-in fade-in zoom-in-95">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        {serverMessage}
+                    </div>
+                )}
+
+                {serverError && (
+                    <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm flex items-center gap-2 animate-in fade-in zoom-in-95">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {serverError}
+                    </div>
+                )}
+            </form>
+        </div>
     );
 }

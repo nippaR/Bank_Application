@@ -1,13 +1,10 @@
 'use client'
-import { useState } from 'react'
+import LoginForm from '@/components/auth/LoginForm'
 
 function Homepage() {
-  const [count, setCount] = useState(0)
   return (
-    <div>
-      <h1>Homepage</h1>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>Increment</button>
+    <div className="flex justify-center items-center h-screen">
+      <LoginForm />
     </div>
   )
 }

@@ -35,3 +35,20 @@ export async function sendMailWithAttachment({
         ],
     });
 }
+
+export async function sendSimpleMail({
+    to,
+    subject,
+    text,
+}: {
+    to: string;
+    subject: string;
+    text: string;
+}) {
+    await transporter.sendMail({
+        from: process.env.EMAIL_FROM,
+        to,
+        subject,
+        text,
+    });
+}

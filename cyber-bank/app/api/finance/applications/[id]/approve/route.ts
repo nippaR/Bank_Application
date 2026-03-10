@@ -1,40 +1,55 @@
-import nodemailer from "nodemailer";
+import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import { generateApprovalPdf } from "@/lib/pdf";
+import { sendMailWithAttachment } from "@/lib/mail";
 
-export const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-});
+type Params = {
+    params: Promise<{ id: string }>;
+};
 
-export async function sendMailWithAttachment({
-    to,
-    subject,
-    text,
-    pdfBuffer,
-    filename,
-}: {
-    to: string;
-    subject: string;
-    text: string;
-    pdfBuffer: Buffer;
-    filename: string;
-}) {
-    await transporter.verify();
-    console.log("Mailer verified successfully");
+export async function POST(_: Request, { params }: Params) {
+    try {
+        const { id } = await params;
 
-    await transporter.sendMail({
-        from: process.env.EMAIL_FROM,
-        to,
-        subject,
-        text,
-        attachments: [
-            {
-                filename,
-                content: pdfBuffer,
-                contentType: "application/pdf",
+        const application = await prisma.creditCardApplication.update({
+            where: { id },
+            data: {
+                status: "APPROVED",
             },
-        ],
-    });
+        });
+
+        // Generate approval PDF
+        const pdfBuffer = await generateApprovalPdf({
+            customerName: application.fullName,
+            address: application.residentialAddress,
+            telephone: application.mobilePhone,
+            nic: application.nicPassportNumber,
+        });
+
+        // Send approval email
+        await sendMailWithAttachment({
+            to: application.email,
+            subject: "Credit Card Application Approved",
+            text: "Congratulations! Your credit card application has been approved. Please find your approval letter attached.",
+            pdfBuffer,
+            filename: "credit-card-approval-letter.pdf",
+        });
+
+        return NextResponse.redirect(
+            new URL(
+                "/finance/dashboard",
+                process.env.NEXTAUTH_URL || "http://localhost:3000"
+            )
+        );
+    } catch (error: any) {
+        console.error("Approve application error:", error);
+
+        return NextResponse.json(
+            {
+                success: false,
+                message: error?.message || "Failed to approve application",
+            },
+            { status: 500 }
+        );
+    }
 }
