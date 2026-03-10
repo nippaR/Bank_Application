@@ -28,7 +28,7 @@ export default function Navbar() {
     return (
         <nav className="glass-morphism sticky top-0 z-50 px-6 py-4 rounded-xl bg-black/70">
             <div className="max-w-7xl mx-auto flex justify-between items-center">
-                <Link href="/" className="text-xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+                <Link href="#" className="text-xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
                     Cyber Bank
                 </Link>
 
